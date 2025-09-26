@@ -12,7 +12,7 @@ In industry, vibration/thermal testing involves simulating real-world conditions
  4. Confirm that the project works by running `make`
 
 ## Flashing the board
-###flash.sh will be different for mac/windows:
+### flash.sh will be different for mac/windows:
  For mac:
 
  ```
