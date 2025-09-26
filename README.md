@@ -1,8 +1,7 @@
-# STM32G4xx Project Template
+# PCB Vibration and Thermal Tester
 
 ## Overview
-This is a Github template with everything needed to make a new STM32G4xx project from scratch.
-This is not meant to be edited with production code.
+In industry, vibration/thermal testing involves simulating real-world conditions where a system is subjected to simultaneous temperature and vibration changes. This project involves developing a custom test setup where we can simulate these conditions in a controlled, reproducible environment. 
 
 ## Setup
  1. Go to the Github website view of this repository, and in the top right corner, create a
