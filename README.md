@@ -1,8 +1,7 @@
-# STM32G4xx Project Template
+# PCB Vibration and Thermal Tester
 
 ## Overview
-This is a Github template with everything needed to make a new STM32G4xx project from scratch.
-This is not meant to be edited with production code.
+In industry, vibration/thermal testing involves simulating real-world conditions where a system is subjected to simultaneous temperature and vibration changes. This project involves developing a custom test setup where we can simulate these conditions in a controlled, reproducible environment. 
 
 ## Setup
  1. Go to the Github website view of this repository, and in the top right corner, create a
@@ -17,6 +16,31 @@ This is not meant to be edited with production code.
  1. Ensure git checkout stm32g441 was run in both template and core.
  2. Ensure openocd.cfg is set to ST-Link not J-Link (default when cloning from racing github).
  3. Ensure core_config.h clock is set to 0 and not 1 (default when cloning from racing github).
+
+## Flashing the board
+### flash.sh will be different for mac/windows:
+ For mac:
+
+ ```
+#!/usr/bin/env bash
+ 
+# Load the project name from the Makefile
+PROJECT_NAME=template
+PROJECT_VERSION=f33
+if [[ $(cat Makefile) =~ PROJECT_NAME[[:space:]]*:=[[:space:]]*([^[:space:]]*) ]]; then
+    PROJECT_NAME=${BASH_REMATCH[1]}
+fi
+if [[ $(cat Makefile) =~ PROJECT_VERSION[[:space:]]*:=[[:space:]]*([^[:space:]]*) ]]; then
+    PROJECT_VERSION=${BASH_REMATCH[1]}
+fi
+ 
+ELF=build/stm32/$PROJECT_NAME-$PROJECT_VERSION.elf
+
+echo "Programming with $ELF"
+
+openocd -f ./openocd.cfg -c "program ${ELF} verify reset" -c "exit"
+ ```
+>>>>>>> e02a6222a0263825bb921b485c197c5e1278c059
 
 ## Requirements
 ### Windows-Specific:
