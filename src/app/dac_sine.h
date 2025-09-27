@@ -1,17 +1,21 @@
 #pragma once
 #include "stm32g4xx_hal.h"
+#include <stdint.h>
 
-/* Public API */
-void SineGen_Init(void);
-void SineGen_Task(void);
+/* ===== USER CONFIG: button pins =====
+   Active-low with pull-ups, change here if wiring changes */
+#define BTN_UP_GPIO_PORT    GPIOA
+#define BTN_UP_PIN          GPIO_PIN_2   /* UP button */
 
-/* Frequency range from your potentiometer (Hz) */
-#define SINEGEN_FMIN_HZ  0.0f
-#define SINEGEN_FMAX_HZ  50.0f
+#define BTN_DN_GPIO_PORT    GPIOA
+#define BTN_DN_PIN          GPIO_PIN_3   /* DOWN button */
 
-/* Number of samples per period (smoother at low Hz if larger) */
-#define SINEGEN_SINE_LEN 1024
+/* Frequency window and step (Hz) */
+#define FREQ_MIN_HZ         20.0f
+#define FREQ_MAX_HZ         100.0f
+#define FREQ_STEP_HZ        10.0f
 
-/* Timer input clock (Hz). If using HSI 16 MHz and APB prescalers=1, TIM6=16 MHz. */
-#define SINEGEN_TIM_CLK_HZ  16000000UL
-
+void  SineGen_Init(void);
+void  SineGen_Task(void);          /* polls buttons & retunes */
+float SineGen_GetFreqHz(void);
+void  SineGen_SetFreqHz(float f_hz);
