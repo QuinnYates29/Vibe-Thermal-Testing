@@ -12,6 +12,12 @@ This is not meant to be edited with production code.
     argument.
  4. Confirm that the project works by running `make`
 
+## Troubleshooting
+### Flash Isn't Working
+ 1. Ensure git checkout stm32g441 was run in both template and core.
+ 2. Ensure openocd.cfg is set to ST-Link not J-Link (default when cloning from racing github).
+ 3. Ensure core_config.h clock is set to 0 and not 1 (default when cloning from racing github).
+
 ## Requirements
 ### Windows-Specific:
 - [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install)
