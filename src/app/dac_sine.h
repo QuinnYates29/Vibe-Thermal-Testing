@@ -2,20 +2,31 @@
 #include "stm32g4xx_hal.h"
 #include <stdint.h>
 
-/* ===== USER CONFIG: button pins =====
-   Active-low with pull-ups, change here if wiring changes */
-#define BTN_UP_GPIO_PORT    GPIOA
-#define BTN_UP_PIN          GPIO_PIN_2   /* UP button */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define BTN_DN_GPIO_PORT    GPIOA
-#define BTN_DN_PIN          GPIO_PIN_3   /* DOWN button */
+/* ========= Build-time toggle =========
+   1 = output on PA5 (DAC1_CH2)   [often tied to user LED on Nucleo]
+   0 = output on PA4 (DAC1_CH1)   [cleaner on many boards]
+*/
+#define SINE_OUT_ON_PA5   1
 
-/* Frequency window and step (Hz) */
-#define FREQ_MIN_HZ         20.0f
-#define FREQ_MAX_HZ         100.0f
-#define FREQ_STEP_HZ        10.0f
+/* ========= Frequency settings ========= */
+#define SINEGEN_F_MIN     20u
+#define SINEGEN_F_MAX     100u
+#define SINEGEN_F_STEP    10u
 
-void  SineGen_Init(void);
-void  SineGen_Task(void);          /* polls buttons & retunes */
-float SineGen_GetFreqHz(void);
-void  SineGen_SetFreqHz(float f_hz);
+/* ========= Sine LUT settings ========= */
+#define SINEGEN_SINE_LEN  256u
+
+/* ========= Public API ========= */
+void SineGen_Init(void);
+void SineGen_Task(void);
+
+/* ========= Error handler (weak) ========= */
+void Error_Handler(void);
+
+#ifdef __cplusplus
+}
+#endif
