@@ -39,6 +39,7 @@ STM32CUBE_HAL_DIR := $(STM32CUBE_DIR)/Drivers/STM32G4xx_HAL_Driver
 STM32CUBE_CMSIS_DIR := $(STM32CUBE_DIR)/Drivers/CMSIS/Device/ST/STM32G4xx
 STM32CUBE_SRC_DIRS := $(STM32CUBE_HAL_DIR)/Src
 STM32CUBE_SRCS := $(shell find $(STM32CUBE_SRC_DIRS) -maxdepth 1 -type f -name "*.c") $(STM32CUBE_CMSIS_DIR)/Source/Templates/system_stm32g4xx.c
+STM32CUBE_SRCS := $(filter-out $(STM32CUBE_HAL_DIR)/Src/stm32g4xx_hal_timebase_tim_template.c, $(STM32CUBE_SRCS))
 STM32CUBE_ASMS := src/startup_stm32g441xx.s
 STM32CUBE_INCLUDES := $(STM32CUBE_HAL_DIR)/Inc $(STM32CUBE_DIR)/Drivers/CMSIS/Include $(STM32CUBE_CMSIS_DIR)/Include
 STM32CUBE_INCLUDES := $(foreach d, $(STM32CUBE_INCLUDES),-I $d)
