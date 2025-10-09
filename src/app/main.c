@@ -7,6 +7,7 @@ Increments by 10hz with each button click
 #include "stm32g4xx_hal.h"
 #include "dac.h"     /* your driver: core_DAC_* API */
 #include <stdbool.h>
+#include <stdint.h>
 
 //user config
 #define APP_FREQ_MIN_HZ      20.0f
@@ -28,56 +29,24 @@ Increments by 10hz with each button click
 #define BTN_DEBOUNCE_MS      25u
 
 //forward declerations
-HAL_Init();
-bool core_clock_init()
+bool core_clock_init();
 static void MX_GPIO_Init_Buttons(void);
 
-/**
-*Debounce Helper
-*/
-
 typedef struct {
-    GPIO_PinState stable;
-    GPIO_PinState last_raw;
-    uint32_t      last_change_ms;
+  GPIO_PinState stable;
+  GPIO_PinState last_raw;
+  uint32_t      last_change_ms;
 } debounce_t;
 
-static void debounce_init(debounce_t *d, GPIO_PinState initial)
-{
-    d->stable = d->last_raw = initial;
-    d->last_change_ms = HAL_GetTick();
-}
-
-/* returns true on a debounced falling edge (HIGH->LOW), i.e., press for active-low */
-static bool debounce_falling_edge(debounce_t *d, GPIO_PinState raw_now)
-{
-    uint32_t now = HAL_GetTick();
-
-    if (raw_now != d->last_raw) {
-        d->last_raw = raw_now;
-        d->last_change_ms = now;
-    }
-
-    /* if raw has been different from stable long enough, adopt it */
-    if ((now - d->last_change_ms) >= BTN_DEBOUNCE_MS && d->stable != d->last_raw) {
-        GPIO_PinState prev_stable = d->stable;
-        d->stable = d->last_raw;
-
-        /* detect falling edge (HIGH -> LOW) = button press (active-low) */
-        if (prev_stable == GPIO_PIN_SET && d->stable == GPIO_PIN_RESET) {
-            return true;
-        }
-    }
-    return false;
-}
-
+static void debounce_init(debounce_t *d, GPIO_PinState initial);
+static bool debounce_falling_edge(debounce_t *d, GPIO_PinState raw_now);
 /*
 **MAIN**
 */
 int main(void)
 {
     HAL_Init();
-    core_clock_init()
+    core_clock_init();
 
     MX_GPIO_Init_Buttons();
 
@@ -89,7 +58,6 @@ int main(void)
         .pin                = DAC_PIN,
         .allowed_connections= CORE_DAC_ALLOWED_DAC1, /* doc-only bitmask */
         .channel            = DAC_CHANNEL_LOGICAL,   /* CH1=PA4, CH2=PA5 */
-        .opamp_chan         = 0,                     /* not using internal OPAMP here */
         .trigger_tim        = TIM6,                  /* driver will init TIM6 as TRGO */
         .tim_input_hz       = 0,                     /* 0 => let driver infer from RCC */
         .fs_hz              = CORE_DAC_SINE_FS_HZ,   /* fixed sample rate (25 kHz default) */
@@ -155,8 +123,7 @@ int main(void)
 /**
 *Button Initialization
 */
-static void MX_GPIO_Init_Buttons(void)
-{
+static void MX_GPIO_Init_Buttons(void){
     /* Enable GPIOA clock (adjust if your buttons are on a different port) */
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
@@ -172,5 +139,31 @@ static void MX_GPIO_Init_Buttons(void)
     HAL_GPIO_Init(BTN_PORT, &gi);
 }
 
+static void debounce_init(debounce_t *d, GPIO_PinState initial)
+{
+    d->stable = d->last_raw = initial;
+    d->last_change_ms = HAL_GetTick();
+}
 
+/* returns true on a debounced falling edge (HIGH->LOW), i.e., press for active-low */
+static bool debounce_falling_edge(debounce_t *d, GPIO_PinState raw_now)
+{
+    uint32_t now = HAL_GetTick();
 
+    if (raw_now != d->last_raw) {
+        d->last_raw = raw_now;
+        d->last_change_ms = now;
+    }
+
+    /* if raw has been different from stable long enough, adopt it */
+    if ((now - d->last_change_ms) >= BTN_DEBOUNCE_MS && d->stable != d->last_raw) {
+        GPIO_PinState prev_stable = d->stable;
+        d->stable = d->last_raw;
+
+        /* detect falling edge (HIGH -> LOW) = button press (active-low) */
+        if (prev_stable == GPIO_PIN_SET && d->stable == GPIO_PIN_RESET) {
+            return true;
+        }
+    }
+    return false;
+}

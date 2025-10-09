@@ -48,9 +48,9 @@ typedef struct core_DAC_def_s {
     GPIO_TypeDef *port;             /* GPIO port for the DAC pin (e.g., GPIOA)      */
     uint32_t      pin;              /* GPIO pin (e.g., GPIO_PIN_4 or GPIO_PIN_5)    */
     uint16_t      allowed_connections; /* bitmask: CORE_DAC_ALLOWED_*                */
-    uint8_t       channel;          /* CORE_DAC_CH1 (PA4) or CORE_DAC_CH2 (PA5)
+    uint8_t       channel;          /* CORE_DAC_CH1 (PA4) or CORE_DAC_CH2 (PA5)*/
 
-     /* Trigger timer and clocking (fixed-fs NCO) */
+    /* Trigger timer and clocking (fixed-fs NCO) */
     TIM_TypeDef  *trigger_tim;      /* usually TIM6                                  */
     uint32_t      tim_input_hz;     /* clock into trigger_tim after prescalers       */
 

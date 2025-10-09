@@ -10,32 +10,32 @@
 #ifndef CORE_DAC_DMA_INSTANCE
 #define CORE_DAC_DMA_INSTANCE           DMA1
 #endif
-#ifndef CORE_DAC_DMA_CHANNEL_CH1
-#define CORE_DAC_DMA_CHANNEL_CH1        DMA1_Channel3
+#ifndef CORE_DAC_DMA_CHANNEL_CHANNEL1
+#define CORE_DAC_DMA_CHANNEL_CHANNEL1        DMA1_Channel3
 #endif
-#ifndef CORE_DAC_DMA_CHANNEL_CH2
-#define CORE_DAC_DMA_CHANNEL_CH2        DMA1_Channel4
+#ifndef CORE_DAC_DMA_CHANNEL_CHANNEL2
+#define CORE_DAC_DMA_CHANNEL_CHANNEL2        DMA1_Channel4
 #endif
 
 /**
 *DMAMUX IDs
 *needs to match HAL version meaning same channel as above DMA
 */
-#ifndef CORE_DAC_DMAMUX_REQ_CH1
-  #if defined(DMA_REQUEST_DAC1_CH1)
-    #define CORE_DAC_DMAMUX_REQ_CH1     DMA_REQUEST_DAC1_CH1
-  #elif defined(LL_DMAMUX_REQ_DAC1_CH1)
-    #define CORE_DAC_DMAMUX_REQ_CH1     LL_DMAMUX_REQ_DAC1_CH1
+#ifndef CORE_DAC_DMAMUX_REQ_CHANNEL1
+  #if defined(DMA_REQUEST_DAC1_CHANNEL1)
+    #define CORE_DAC_DMAMUX_REQ_CHANNEL1     DMA_REQUEST_DAC1_CHANNEL1
+  #elif defined(LL_DMAMUX_REQ_DAC1_CHCANNEL1)
+    #define CORE_DAC_DMAMUX_REQ_CHANNEL1     LL_DMAMUX_REQ_DAC1_CHANNEL1
   #else
     #error "Define CORE_DAC_DMAMUX_REQ_CH1 to your DMAMUX request for DAC1_CH1."
   #endif
 #endif
 
-#ifndef CORE_DAC_DMAMUX_REQ_CH2
-  #if defined(DMA_REQUEST_DAC1_CH2)
-    #define CORE_DAC_DMAMUX_REQ_CH2     DMA_REQUEST_DAC1_CH2
-  #elif defined(LL_DMAMUX_REQ_DAC1_CH2)
-    #define CORE_DAC_DMAMUX_REQ_CH2     LL_DMAMUX_REQ_DAC1_CH2
+#ifndef CORE_DAC_DMAMUX_REQ_CHANNEL2
+  #if defined(DMA_REQUEST_DAC1_CHANNEL2)
+    #define CORE_DAC_DMAMUX_REQ_CHANNEL2     DMA_REQUEST_DAC1_CHANNEL2
+  #elif defined(LL_DMAMUX_REQ_DAC1_CHANNEL2)
+    #define CORE_DAC_DMAMUX_REQ_CHANNEL2     LL_DMAMUX_REQ_DAC1_CHANNEL2
   #else
     #error "Define CORE_DAC_DMAMUX_REQ_CH2 to your DMAMUX request for DAC1_CH2."
   #endif
@@ -45,11 +45,11 @@
 *NVIC IRQ for chosen DMA 
 *Controls Interupts
 */
-#ifndef CORE_DAC_DMA_IRQn_CH1
-#define CORE_DAC_DMA_IRQn_CH1           DMA1_Channel3_IRQn
+#ifndef CORE_DAC_DMA_IRQn_CHANNEL1
+#define CORE_DAC_DMA_IRQn_CHANNEL1           DMA1_Channel3_IRQn
 #endif
-#ifndef CORE_DAC_DMA_IRQn_CH2
-#define CORE_DAC_DMA_IRQn_CH2           DMA1_Channel4_IRQn
+#ifndef CORE_DAC_DMA_IRQn_CHANNEL2
+#define CORE_DAC_DMA_IRQn_CHANNEL2           DMA1_Channel4_IRQn
 #endif
 
 /**
@@ -118,7 +118,8 @@ static void build_lut(uint16_t len) {
         double theta = two_pi * (double)i / (double)len;
         /* Map sin(theta) from [-1,1] to [0..4095] with center ~2048, amplitude ~2047 */
         int32_t v = (int32_t)lrint(2048.0 + 2047.0 * sin(theta));
-        if (v < 0) v = 0; if (v > 4095) v = 4095;
+        if (v < 0) v = 0; 
+        if (v > 4095) v = 4095;
         g_lut[i] = (uint16_t)v;
     }
 }
@@ -193,7 +194,7 @@ static HAL_StatusTypeDef dac_channel_init(uint8_t channel) {
     cfg.DAC_Trigger      = DAC_TRIGGER_T6_TRGO;
     cfg.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 
-    uint32_t ch = (channel == CORE_DAC_CH2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
+    uint32_t ch = (channel == CORE_DAC_CHANNEL2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
     if (HAL_DAC_ConfigChannel(&g_hdac, &cfg, ch) != HAL_OK) return HAL_ERROR;
 
     return HAL_OK;
@@ -205,14 +206,14 @@ static void dma_pick_channel_and_request(uint8_t channel,
                                          uint32_t *request_id,
                                          IRQn_Type *irqn)
 {
-    if (channel == CORE_DAC_CH2) {
-        *dma_ch   = CORE_DAC_DMA_CHANNEL_CH2;
-        *request_id = CORE_DAC_DMAMUX_REQ_CH2;
-        *irqn = CORE_DAC_DMA_IRQn_CH2;
+    if (channel == CORE_DAC_CHANNEL2) {
+        *dma_ch   = CORE_DAC_DMA_CHANNEL_CHANNEL2;
+        *request_id = CORE_DAC_DMAMUX_REQ_CHANNEL2;
+        *irqn = CORE_DAC_DMA_IRQn_CHANNEL2;
     } else {
-        *dma_ch   = CORE_DAC_DMA_CHANNEL_CH1;
-        *request_id = CORE_DAC_DMAMUX_REQ_CH1;
-        *irqn = CORE_DAC_DMA_IRQn_CH1;
+        *dma_ch   = CORE_DAC_DMA_CHANNEL_CHANNEL1;
+        *request_id = CORE_DAC_DMAMUX_REQ_CHANNEL1;
+        *irqn = CORE_DAC_DMA_IRQn_CHANNEL1;
     }
 }
 
@@ -241,7 +242,7 @@ static HAL_StatusTypeDef dma_init_for_dac(uint8_t channel) {
     if (HAL_DMA_Init(&g_hdma) != HAL_OK) return HAL_ERROR;
 
     /* Link DMA to DAC handle (Handle1 for CH1, Handle2 for CH2 per HAL) */
-    if (channel == CORE_DAC_CH2) {
+    if (channel == CORE_DAC_CHANNEL2) {
         __HAL_LINKDMA(&g_hdac, DMA_Handle2, g_hdma);
     } else {
         __HAL_LINKDMA(&g_hdac, DMA_Handle1, g_hdma);
@@ -297,7 +298,7 @@ bool core_DAC_init(DAC_TypeDef *dac) {
 bool core_DAC_setup_pin(GPIO_TypeDef *port, uint32_t pin, uint8_t channel) {
     /* Basic GPIO analog setup, no pulls */
     if (!port) return false;
-    if (channel != CORE_DAC_CH1 && channel != CORE_DAC_CH2) return false;
+    if (channel != CORE_DAC_CHANNEL1 && channel != CORE_DAC_CHANNEL2) return false;
 
     /* Enable GPIO clock heuristically; user can pre-enable elsewhere too */
     if (port == GPIOA) __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -318,7 +319,7 @@ bool core_DAC_setup_pin(GPIO_TypeDef *port, uint32_t pin, uint8_t channel) {
 
 bool core_DAC_write_u12(uint8_t channel, uint16_t value_0_4095) {
     if (g_running) return false; /* don’t interfere while streaming */
-    uint32_t ch = (channel == CORE_DAC_CH2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
+    uint32_t ch = (channel == CORE_DAC_CHANNEL2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
     if (HAL_DAC_ConfigChannel(&g_hdac, &(DAC_ChannelConfTypeDef){
         .DAC_Trigger = DAC_TRIGGER_NONE,
         .DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE
@@ -340,8 +341,8 @@ bool core_DAC_sine_init(core_DAC_def_t *cfg) {
     g_cfg = *cfg;
     if (g_cfg.fs_hz == 0)     g_cfg.fs_hz = CORE_DAC_SINE_FS_HZ;
     if (g_cfg.lut_len == 0)   g_cfg.lut_len = CORE_DAC_SINE_LUT_LEN;
-    if (g_cfg.channel != CORE_DAC_CH1 && g_cfg.channel != CORE_DAC_CH2)
-        g_cfg.channel = CORE_DAC_CH1;
+    if (g_cfg.channel != CORE_DAC_CHANNEL1 && g_cfg.channel != CORE_DAC_CHANNEL2)
+        g_cfg.channel = CORE_DAC_CHANNEL1;
 
     /* GPIO to analog */
     if (!core_DAC_setup_pin(g_cfg.port, g_cfg.pin, g_cfg.channel)) return false;
@@ -349,7 +350,7 @@ bool core_DAC_sine_init(core_DAC_def_t *cfg) {
     /* TIM6 @ fs_hz with TRGO=Update */
     if (tim6_init_fixed_fs(g_cfg.fs_hz) != HAL_OK) return false;
 
-    /* DAC channel with trigger = TIM6 TRGO */
+    /**DAC channel with trigger = TIM6 TRGO */
     if (dac_channel_init(g_cfg.channel) != HAL_OK) return false;
 
     /* DMA / DMAMUX configured and linked to DAC */
@@ -396,7 +397,7 @@ bool core_DAC_sine_start(float freq_hz, float amplitude_0to1, float offset_0to1)
     nco_fill(&g_buf[CORE_DAC_SINE_CHUNK], CORE_DAC_SINE_CHUNK);
 
     /* Start DAC with DMA (HAL handles DMAMUX routing already configured) */
-    uint32_t ch = (g_cfg.channel == CORE_DAC_CH2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
+    uint32_t ch = (g_cfg.channel == CORE_DAC_CHANNEL2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
     if (HAL_DAC_Start_DMA(&g_hdac, ch, (uint32_t*)g_buf, (uint32_t)(CORE_DAC_SINE_CHUNK * 2), DAC_ALIGN_12B_R) != HAL_OK)
         return false;
 
@@ -412,7 +413,7 @@ bool core_DAC_sine_start(float freq_hz, float amplitude_0to1, float offset_0to1)
 
 void core_DAC_sine_stop(void) {
     if (!g_running) return;
-    uint32_t ch = (g_cfg.channel == CORE_DAC_CH2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
+    uint32_t ch = (g_cfg.channel == CORE_DAC_CHANNEL2) ? DAC_CHANNEL_2 : DAC_CHANNEL_1;
 
     HAL_TIM_Base_Stop(&g_htim6);
     HAL_DAC_Stop_DMA(&g_hdac, ch);
